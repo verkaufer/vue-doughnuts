@@ -14,8 +14,6 @@
             <b-nav-item to="/">Home</b-nav-item>
             <b-nav-item>Donuts</b-nav-item>
             <b-nav-item to="/feed">Feed</b-nav-item>
-            <b-nav-item to="/login" v-show="!authenticated">Login</b-nav-item>
-            <b-nav-item to="/logout" v-show="authenticated">Logout</b-nav-item>
           </b-nav>
         </b-collapse>
       </b-navbar>
