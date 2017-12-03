@@ -1,38 +1,67 @@
 <template>
   <div id="google-map" class="map-panel">
-  <gmap-map
-    :center="center"
-    :zoom="13"
-    style="height:500px;position:relative;"
-    ref="map">
-    <gmap-info-window :options="infoWindow.options"
-                      :position="infoWindow.pos"
-                      :opened="infoWindow.open"
-                      @closeclick="infoWindow.open=false">
-      {{ infoWindow.content }}
-    </gmap-info-window>
-    <gmap-marker
-      :key="index"
-      v-for="(m, index) in markers"
-      :position="m.position"
-      :clickable="true"
-      :draggable="true"
-      @click="center=m.position;toggleInfoWindow(m,index)"
-    ></gmap-marker>
-  </gmap-map>
-    <button @click.prevent="findDonuts">Click me</button>
+    <b-row>
+      <b-col>
+        <b-form inline>
+          <b-input id="zip_search"
+                   placeholder="Enter your ZIP Code"
+                   class="mb-2 mr-sm-2 form-control"
+                   v-model="userZipCode"
+          />
+          <b-button variant="primary"
+                    class="mb-2 mr-sm-2 form-control"
+                    @click.prevent="findDonuts">Search</b-button>
+        </b-form>
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col>
+        <gmap-map
+          :center="center"
+          :zoom="13"
+          style="height:300px;position:relative;"
+          ref="map">
+          <gmap-info-window :options="infoWindow.options"
+                            :position="infoWindow.pos"
+                            :opened="infoWindow.open"
+                            @closeclick="infoWindow.open=false">
+            {{ infoWindow.content }}
+          </gmap-info-window>
+          <gmap-marker
+            :key="index"
+            v-for="(m, index) in markers"
+            :position="m.position"
+            :clickable="true"
+            :draggable="true"
+            @click="center=m.position;toggleInfoWindow(m,index)"
+          ></gmap-marker>
+        </gmap-map>
+        <button @click.prevent="findDonuts">Click me</button>
+      </b-col>
+    </b-row>
+    <donut-shop-info :shop-info="infoWindow.content" v-show="infoWindow.open"></donut-shop-info>
   </div>
 </template>
 
 <script>
+  import axios from 'axios'
+
+  import PlaceFinderService from '@/services/places'
+  import DonutShopInfo from '@/components/DonutShopInfo'
+  import {geocoderAPIPath} from '@/services/configs'
+
   export default {
+    components: {
+      DonutShopInfo
+    },
     data () {
       return {
+        userZipCode: null,
         center: {lat: 45.5231, lng: -122.6765},
         markers: [],
         currentMarkerIndex: null,
         infoWindow: {
-          content: '',
+          content: {},
           pos: { lat: 0, lng: 0 },
           open: false,
           options: {
@@ -56,7 +85,11 @@
       },
       toggleInfoWindow (marker, index) {
         this.infoWindow.pos = marker.position
-        this.infoWindow.content = `${marker.infoText.name}\n${marker.infoText.address}`
+        this.infoWindow.content = {
+          name: marker.infoText.name,
+          address: marker.infoText.address,
+          placeId: marker.infoText.placeId
+        }
 
         if (this.currentMarkerIndex === index) {
           this.infoWindow.open = !this.infoWindow.open
@@ -66,45 +99,41 @@
         }
       },
       findDonuts () {
-        const pService = new window.google.maps.places.PlacesService(this.$refs.map.$mapObject)
-        const request = {
-          location: {lat: 45.5231, lng: -122.6765},
-          radius: 5000,
-          name: 'doughnut',
-          type: 'bakery'
-        }
         let self = this
-        pService.nearbySearch(request, function (results, status) {
-          console.log(results)
-          if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-            for (let i = 0; i < results.length; i++) {
-              console.log(results[0].geometry.location.lat())
-              self.markers.push({
-                position: new window.google.maps.LatLng(results[i].geometry.location.lat(),
-                                                        results[i].geometry.location.lng()),
-                infoText: {
-                  name: results[i].name,
-                  address: results[i].vicinity
-                }
-              })
-            }
-          } else {
-            console.log(`Encountered error: ${status}`)
-          }
+        axios({
+          method: 'get',
+          url: geocoderAPIPath(this.userZipCode)
+        }).then(response => {
+          // Update map to show the ZIP we looked up
+          self.center = response.data.results[0].geometry.location
+          return response.data.results[0].geometry.location
+        }).then(geolocation => {
+          const placesSearchService = new PlaceFinderService(self.$refs.map.$mapObject)
+          return placesSearchService
+                    .findPlaces(geolocation)
+                    .then(placesSearchService.buildMarkers)
+        }).then(markers => {
+          self.markers = markers
+        }).catch(err => {
+          /* es-lint disable */
+          console.log(err)
         })
       }
     }
   }
 </script>
 
-<styles>
-  .map-panel {
+<style>
+.map-panel {
     flex: 4 1 80%;
-  }
-
-  gmap-map {
+}
+gmap-map {
   width: 100%;
-  height: 600px;
+  height: 30%;
   display: block;
 }
-</styles>
+
+#zip_search {
+  flex-grow: 1;
+}
+</style>

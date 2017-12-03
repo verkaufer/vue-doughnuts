@@ -20,7 +20,7 @@
     </div>
       <main role="main">
 
-        <div class="jumbotron">
+        <div id="content-panel">
           <router-view></router-view>
         </div>
         <b-row>
@@ -90,5 +90,12 @@
 
 .top-nav {
   margin-bottom: 1rem;
+}
+
+#content-panel {
+  padding: 2rem 1rem;
+  margin-bottom: 2rem;
+  background-color: #e9ecef;
+  border-radius: 0.3rem;
 }
 </style>

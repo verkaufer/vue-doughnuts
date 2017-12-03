@@ -7,4 +7,6 @@ const firebaseConfig = {
   messagingSenderId: '1080064941587'
 }
 
-export {firebaseConfig}
+const geocoderAPIPath = (zipCode) => `https://maps.googleapis.com/maps/api/geocode/json?address=${zipCode},US`
+
+export {firebaseConfig, geocoderAPIPath}
