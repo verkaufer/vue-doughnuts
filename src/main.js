@@ -3,10 +3,13 @@
 import Vue from 'vue'
 import App from '@/App'
 import router from './router'
+import {firebaseConfig, googleMapsAPI} from './services/configs'
+import { store } from '@/store'
 
 import BootstrapVue from 'bootstrap-vue'
 import VueFire from 'vuefire'
 import * as VueGoogleMaps from 'vue2-google-maps'
+import firebase from 'firebase'
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -14,10 +17,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 Vue.use(BootstrapVue)
 Vue.use(VueFire)
 Vue.use(VueGoogleMaps, {
-  load: {
-    key: 'AIzaSyCkpn5G3vMjGfMwbXSni8Hc9FEXsjWNGZs',
-    libraries: 'places'
-  }
+  load: googleMapsAPI
 })
 
 Vue.config.productionTip = false
@@ -26,6 +26,15 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
+  store,
+  created () {
+    firebase.initializeApp(firebaseConfig)
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.$store.dispatch('updateAuthState', user)
+      }
+    })
+  },
   template: '<App/>',
   components: { App },
   watch: {

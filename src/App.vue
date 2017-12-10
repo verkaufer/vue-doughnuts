@@ -14,6 +14,9 @@
             <b-nav-item to="/">Home</b-nav-item>
             <b-nav-item>Donuts</b-nav-item>
             <b-nav-item to="/feed">Feed</b-nav-item>
+            <b-nav-item v-if="!authenticated" to="/login">Login</b-nav-item>
+            <b-nav-item v-if="authenticated" @click="logout">Logout</b-nav-item>
+            <p v-if="authenticated">{{ $store.state.user.user.email }}</p>
           </b-nav>
         </b-collapse>
       </b-navbar>
@@ -64,11 +67,27 @@
 </style>
 
 <script>
+  import firebase from 'firebase'
+  import { mapGetters } from 'vuex'
+
   export default {
     name: 'app',
     data () {
       return {
-        authenticated: false
+      }
+    },
+    computed: {
+      ...mapGetters([
+        'authenticated'
+      ])
+    },
+    methods: {
+      logout () {
+        firebase.auth().signOut()
+          .then(() => {
+            this.$store.dispatch('logout')
+            this.$router.push('/login')
+          })
       }
     }
   }

@@ -7,6 +7,11 @@ const firebaseConfig = {
   messagingSenderId: '1080064941587'
 }
 
+const googleMapsAPI = {
+  key: 'AIzaSyCkpn5G3vMjGfMwbXSni8Hc9FEXsjWNGZs',
+  libraries: 'places'
+}
+
 const geocoderAPIPath = (zipCode) => `https://maps.googleapis.com/maps/api/geocode/json?address=${zipCode},US`
 
-export {firebaseConfig, geocoderAPIPath}
+export {firebaseConfig, googleMapsAPI, geocoderAPIPath}
