@@ -2,7 +2,7 @@
   <div id="google-map" class="map-panel">
     <b-row>
       <b-col>
-        <b-form inline>
+        <b-form @submit.prevent="findDonuts" inline>
           <b-input id="zip_search"
                    placeholder="Enter your ZIP Code"
                    class="mb-2 mr-sm-2 form-control"
@@ -36,7 +36,6 @@
             @click="center=m.position;toggleInfoWindow(m,index)"
           ></gmap-marker>
         </gmap-map>
-        <button @click.prevent="findDonuts">Click me</button>
       </b-col>
     </b-row>
     <donut-shop-info :shop-info="infoWindow.content" v-show="infoWindow.open"></donut-shop-info>
