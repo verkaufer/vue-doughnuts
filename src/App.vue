@@ -16,7 +16,8 @@
             <b-nav-item to="/feed">Feed</b-nav-item>
             <b-nav-item v-if="!authenticated" to="/login">Login</b-nav-item>
             <b-nav-item v-if="authenticated" @click="logout">Logout</b-nav-item>
-            <p v-if="authenticated">{{ $store.state.user.user.email }}</p>
+            <b-nav-item></b-nav-item>
+            <b-nav-text class="ml-right" v-if="authenticated">Hello, {{ user.email }}</b-nav-text>
           </b-nav>
         </b-collapse>
       </b-navbar>
@@ -78,7 +79,8 @@
     },
     computed: {
       ...mapGetters([
-        'authenticated'
+        'authenticated',
+        'user'
       ])
     },
     methods: {

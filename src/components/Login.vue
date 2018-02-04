@@ -3,6 +3,11 @@
     <b-row class="justify-content-center">
       <b-col md="8">
           <h2>Please Log In</h2>
+          <div v-show="form.errors.length > 0">
+            <b-alert v-for="(errorMsg, index) in form.errors" show variant="danger">
+              {{ errorMsg.details }}
+            </b-alert>
+          </div>
           <b-form @submit.prevent="login">
             <b-form-group id="email"
                           label="Email address">
@@ -22,7 +27,7 @@
                             placeholder="Password">
               </b-form-input>
             </b-form-group>
-            <b-button type="submit" variant="primary">Submit</b-button>
+            <b-button type="submit" :disabled="submittingForm" variant="primary">Submit</b-button>
           </b-form>
         <hr>
         <p>No account? <router-link to="/signup">Sign up here</router-link></p>
@@ -40,19 +45,29 @@
       return {
         form: {
           email: '',
-          password: ''
-        }
+          password: '',
+          errors: []
+        },
+        submittingForm: false
       }
     },
     methods: {
       login () {
+        this.form.errors = []
+        this.submittingForm = true
         firebase.auth().signInWithEmailAndPassword(this.form.email, this.form.password)
           .then(user => {
             this.$store.dispatch('authenticate', user)
             this.$router.push('/home')
           })
-          .catch(err => {
-            console.log(err)
+          .catch(() => {
+            this.formErrors.push({
+              'details': 'Unable to login with that username and password.',
+              'code': 'login_failure'})
+            this.form.password = ''
+          })
+          .then(() => {
+            this.submittingForm = false
           })
       }
     }

@@ -3,6 +3,11 @@
     <b-row class="justify-content-center">
       <b-col md="8">
           <h2>Sign Up</h2>
+          <div v-show="form.errors.length > 0">
+            <b-alert v-for="(errorMsg, code) in form.errors" :key="errorMsg.code" show variant="danger">
+              {{ errorMsg.details }}
+            </b-alert>
+          </div>
           <b-form @submit.prevent="createUser">
             <b-form-group id="email"
                           label="Email address">
@@ -39,18 +44,28 @@
       return {
         form: {
           email: '',
-          password: ''
-        }
+          password: '',
+          errors: []
+        },
+        submittingForm: false
       }
     },
     methods: {
       createUser () {
+        this.submittingForm = true
         firebase.auth().createUserWithEmailAndPassword(this.form.email, this.form.password)
           .then(user => {
             this.$store.dispatch('authenticate', user)
           })
+          .then(() => {
+            this.$router.push('/home')
+          })
           .catch(err => {
             console.log(err)
+            this.form.errors.push({details: err.message, code: err.code})
+          })
+          .then(() => {
+            this.submittingForm = false
           })
       }
     }
