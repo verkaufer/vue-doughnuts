@@ -84,12 +84,7 @@
       },
       toggleInfoWindow (marker, index) {
         this.infoWindow.pos = marker.position
-        this.infoWindow.content = {
-          name: marker.infoText.name,
-          address: marker.infoText.address,
-          placeId: marker.infoText.placeId
-        }
-
+        this.infoWindow.content = this.formatInfoWindow(marker.infoText.name, marker.infoText.address)
         if (this.currentMarkerIndex === index) {
           this.infoWindow.open = !this.infoWindow.open
         } else {
@@ -117,6 +112,12 @@
           /* es-lint disable */
           console.log(err)
         })
+      },
+      formatInfoWindow (name, address) {
+        return '<div>' +
+          '<h3>`${name}`</h3>' +
+          '<address>`${address}`</address>' +
+          '</div>'
       }
     }
   }

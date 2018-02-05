@@ -56,6 +56,12 @@
         firebase.auth().createUserWithEmailAndPassword(this.form.email, this.form.password)
           .then(user => {
             this.$store.dispatch('authenticate', user)
+            return user
+          })
+          .then(user => {
+            return firebase.database().ref('users').child(user.uid).set({
+              email: user.email
+            })
           })
           .then(() => {
             this.$router.push('/home')

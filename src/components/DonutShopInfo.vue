@@ -6,7 +6,8 @@
           <p class="card-text">
             {{ shopInfo.address }}
           </p>
-          <b-button href="#" variant="primary" @click="recordFavoriteShop">Favorite this Shop</b-button>
+          <b-button href="" variant="primary" @click.prevent="recordFavoriteShop">Favorite this Shop</b-button>
+          <b-badge variant="success" v-show="saved">Saved</b-badge>
         </b-card>
       </b-col>
     </b-row>
@@ -20,7 +21,7 @@
     props: ['shopInfo'],
     data () {
       return {
-        //
+        saved: false
       }
     },
     methods: {
@@ -55,28 +56,12 @@
          * @type {string}
          */
         const uid = firebase.auth().currentUser.uid
-
-        this.findShopRef_(this.shopInfo.placeId)
-          .then(shopRef => {
-            return shopRef.child('favorite_for').transaction(favoriteFor => {
-              // Check if favorite_for collection exists on Shop. If not, create it.
-              if (favoriteFor === null) {
-                let payload = {}
-                payload[uid] = true
-                return payload
-              } else {
-                // Toggle user favorite
-                if (favoriteFor[uid]) {
-                  favoriteFor[uid] = null
-                  return favoriteFor
-                }
-                favoriteFor[uid] = true
-                return favoriteFor
-              }
-            })
+        firebase.database().ref('users/' + uid).child('favorites').once('value')
+          .then(favorites => {
+            return favorites.ref.update({[this.shopInfo.placeId]: true})
           })
-          .then(success => {
-            console.log(success)
+          .then(() => {
+            this.saved = true
           })
           .catch(err => {
             console.log(err)

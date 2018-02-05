@@ -61,7 +61,7 @@
             this.$router.push('/home')
           })
           .catch(() => {
-            this.formErrors.push({
+            this.form.errors.push({
               'details': 'Unable to login with that username and password.',
               'code': 'login_failure'})
             this.form.password = ''
