@@ -68,7 +68,6 @@
 </style>
 
 <script>
-  import firebase from 'firebase'
   import { mapGetters } from 'vuex'
 
   export default {
@@ -85,7 +84,7 @@
     },
     methods: {
       logout () {
-        firebase.auth().signOut()
+        this.$firebaseApp.auth().signOut()
           .then(() => {
             this.$store.dispatch('logout')
             this.$router.push('/login')

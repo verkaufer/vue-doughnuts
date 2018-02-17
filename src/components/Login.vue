@@ -37,8 +37,6 @@
 </template>
 
 <script>
-  import firebase from 'firebase'
-
   export default {
     name: 'login',
     data () {
@@ -55,7 +53,7 @@
       login () {
         this.form.errors = []
         this.submittingForm = true
-        firebase.auth().signInWithEmailAndPassword(this.form.email, this.form.password)
+        this.$firebaseApp.auth().signInWithEmailAndPassword(this.form.email, this.form.password)
           .then(user => {
             this.$store.dispatch('authenticate', user)
             this.$router.push('/home')

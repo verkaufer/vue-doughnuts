@@ -10,6 +10,7 @@ import BootstrapVue from 'bootstrap-vue'
 import VueFire from 'vuefire'
 import * as VueGoogleMaps from 'vue2-google-maps'
 import firebase from 'firebase'
+import 'firebase/firestore'
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -22,14 +23,17 @@ Vue.use(VueGoogleMaps, {
 
 Vue.config.productionTip = false
 
+const firebaseApp = firebase.initializeApp(firebaseConfig)
+Vue.prototype.$firebaseApp = firebaseApp
+Vue.prototype.$firestore = firebaseApp.firestore()
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
   store,
   created () {
-    firebase.initializeApp(firebaseConfig)
-    firebase.auth().onAuthStateChanged((user) => {
+    this.$firebaseApp.auth().onAuthStateChanged((user) => {
       if (user) {
         this.$store.dispatch('updateAuthState', user)
       }

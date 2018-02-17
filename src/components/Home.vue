@@ -25,7 +25,7 @@
                             :position="infoWindow.pos"
                             :opened="infoWindow.open"
                             @closeclick="infoWindow.open=false">
-            {{ infoWindow.content }}
+            <span v-html="infoWindow.content"></span>
           </gmap-info-window>
           <gmap-marker
             :key="index"
@@ -60,7 +60,7 @@
         markers: [],
         currentMarkerIndex: null,
         infoWindow: {
-          content: {},
+          content: '',
           pos: { lat: 0, lng: 0 },
           open: false,
           options: {
@@ -114,10 +114,7 @@
         })
       },
       formatInfoWindow (name, address) {
-        return '<div>' +
-          '<h3>`${name}`</h3>' +
-          '<address>`${address}`</address>' +
-          '</div>'
+        return '<div><h3>' + name + '</h3><address>' + address + '</address></div>'
       }
     }
   }

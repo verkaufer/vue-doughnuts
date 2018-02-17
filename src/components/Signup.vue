@@ -36,7 +36,7 @@
 </template>
 
 <script>
-  import firebase from 'firebase'
+  // import firebase from 'firebase'
 
   export default {
     name: 'signup',
@@ -53,13 +53,13 @@
     methods: {
       createUser () {
         this.submittingForm = true
-        firebase.auth().createUserWithEmailAndPassword(this.form.email, this.form.password)
+        this.$firebaseApp.auth().createUserWithEmailAndPassword(this.form.email, this.form.password)
           .then(user => {
             this.$store.dispatch('authenticate', user)
             return user
           })
           .then(user => {
-            return firebase.database().ref('users').child(user.uid).set({
+            return this.$firestore.collection('users').doc(user.uid).set({
               email: user.email
             })
           })
