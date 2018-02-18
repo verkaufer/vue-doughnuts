@@ -5,6 +5,7 @@ import Router from 'vue-router'
 import Home from '@/components/Home'
 import Login from '@/components/Login'
 import Signup from '@/components/Signup'
+import Favorites from '@/components/Favorites'
 
 Vue.use(Router)
 
@@ -28,6 +29,11 @@ let router = new Router({
       path: '/signup',
       name: 'Signup',
       component: Signup
+    },
+    {
+      path: '/favorites',
+      name: 'Favorites',
+      component: Favorites
     }
     // {
     //   path: '/feed',
