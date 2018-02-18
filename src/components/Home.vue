@@ -20,11 +20,12 @@
           :center="center"
           :zoom="13"
           style="height:300px;position:relative;"
-          ref="map">
+          ref="map"
+          @click="infoWindow.open=false">
           <gmap-info-window :options="infoWindow.options"
                             :position="infoWindow.pos"
                             :opened="infoWindow.open"
-                            @closeclick="infoWindow.open=false">
+                            @closeclick="resetSelectedInfoWindow">
             <span v-html="infoWindow.displayableContent"></span>
           </gmap-info-window>
           <gmap-marker
@@ -38,12 +39,13 @@
         </gmap-map>
       </b-col>
     </b-row>
-    <donut-shop-info :shop-info="infoWindow.content" :user="this.$parent.user" v-if="infoWindow.open"></donut-shop-info>
+    <donut-shop-info :shop-info="infoWindow.content" :key="infoWindow.content.placeId" v-if="infoWindow.open"></donut-shop-info>
   </div>
 </template>
 
 <script>
   import axios from 'axios'
+  import { mapGetters } from 'vuex'
 
   import PlaceFinderService from '@/services/places'
   import DonutShopInfo from '@/components/DonutShopInfo'
@@ -72,6 +74,11 @@
         }
       }
     },
+    computed: {
+      ...mapGetters([
+        'user'
+      ])
+    },
     ready: function () {
       window.addEventListener('resize', this.handleResize)
     },
@@ -83,15 +90,17 @@
         this.$gmapDefaultResizeBus.$emit('resize')
       },
       toggleInfoWindow (marker, index) {
+        // Don't update if the clicked marker is already selected
+        if (index === this.currentMarkerIndex) return
+        // Reset data if different
+        if (index !== this.currentMarkerIndex) {
+          this.resetSelectedInfoWindow()
+        }
         this.infoWindow.pos = marker.position
         this.infoWindow.content = marker.infoText
         this.infoWindow.displayableContent = this.formatInfoWindow(marker.infoText.name, marker.infoText.address)
-        if (this.currentMarkerIndex === index) {
-          this.infoWindow.open = !this.infoWindow.open
-        } else {
-          this.infoWindow.open = true
-          this.currentMarkerIndex = index
-        }
+        this.infoWindow.open = true
+        this.currentMarkerIndex = index
       },
       findDonuts () {
         let self = this
@@ -116,6 +125,10 @@
       },
       formatInfoWindow (name, address) {
         return '<div><h3>' + name + '</h3><address>' + address + '</address></div>'
+      },
+      resetSelectedInfoWindow () {
+        this.infoWindow.open = false
+        this.currentMarkerIndex = null
       }
     }
   }

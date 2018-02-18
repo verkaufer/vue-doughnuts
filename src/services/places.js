@@ -1,6 +1,5 @@
 export default class PlaceFinderService {
   constructor (mapInstance) {
-    console.log(mapInstance)
     this.placesServiceInstance = new window.google.maps.places.PlacesService(mapInstance)
     this.OKResponse = window.google.maps.places.PlacesServiceStatus.OK
 

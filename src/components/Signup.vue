@@ -36,7 +36,7 @@
 </template>
 
 <script>
-  // import firebase from 'firebase'
+  import { mapActions } from 'vuex'
 
   export default {
     name: 'signup',
@@ -55,7 +55,7 @@
         this.submittingForm = true
         this.$firebaseApp.auth().createUserWithEmailAndPassword(this.form.email, this.form.password)
           .then(user => {
-            this.$store.dispatch('authenticate', user)
+            this.authenticate(user)
             return user
           })
           .then(user => {
@@ -73,7 +73,10 @@
           .then(() => {
             this.submittingForm = false
           })
-      }
+      },
+      ...mapActions([
+        'authenticate'
+      ])
     }
   }
 </script>

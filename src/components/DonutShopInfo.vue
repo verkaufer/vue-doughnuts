@@ -16,14 +16,21 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
+
   export default {
     name: 'donutShopInfo',
-    props: ['shopInfo', 'user'],
+    props: ['shopInfo'],
     data () {
       return {
         saved: false,
         isFavorite: false
       }
+    },
+    computed: {
+      ...mapGetters([
+        'user'
+      ])
     },
     beforeMount: function () {
       this.checkIfShopIsFavorite()
@@ -37,7 +44,6 @@
           .doc(this.shopInfo.placeId)
           .get()
           .then(favoriteRecord => {
-            console.log(favoriteRecord)
             this.isFavorite = favoriteRecord.exists
           })
           .catch(err => {
