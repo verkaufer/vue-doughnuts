@@ -6,65 +6,74 @@
           <p class="card-text">
             {{ shopInfo.address }}
           </p>
-          <b-button href="" variant="primary" @click.prevent="recordFavoriteShop">Favorite this Shop</b-button>
-          <b-badge variant="success" v-show="saved">Saved</b-badge>
+          <p>
+            <b-button v-if="!isFavorite" href="" variant="primary" @click.prevent="recordFavoriteShop">Favorite Shop</b-button>
+            <b-button v-if="isFavorite" href="" variant="danger" @click.prevent="deleteFavorite">Unfavorite Shop</b-button>
+          </p>
         </b-card>
       </b-col>
     </b-row>
 </template>
 
 <script>
-  import firebase from 'firebase'
-
   export default {
     name: 'donutShopInfo',
-    props: ['shopInfo'],
+    props: ['shopInfo', 'user'],
     data () {
       return {
-        saved: false
+        saved: false,
+        isFavorite: false
       }
     },
+    beforeMount: function () {
+      this.checkIfShopIsFavorite()
+    },
     methods: {
-      /**
-       * Perform GetOrCreate operation on the shop user is adding to Favorites
-       * @param placeId
-       * @returns {Promise<any>}
-       * @private
-       */
-      findShopRef_ (placeId) {
-        return firebase.database().ref('shops').child(placeId).once('value')
-          .then(shopObj => {
-            if (shopObj.exists()) {
-              return Promise.resolve(shopObj.ref)
-            }
-
-            let payload = {}
-            payload[placeId] = {shop_name: this.shopInfo.name}
-
-            return shopObj.ref.parent.update(payload)
-              .then(() => {
-                console.log('created')
-                return Promise.resolve(shopObj.ref)
-              })
-          })
-      },
-
-      recordFavoriteShop () {
-        /**
-         * Record shop as favorited for user (first pass saves user to shop, second pass
-         * saves shop to user)
-         * @type {string}
-         */
-        const uid = firebase.auth().currentUser.uid
-        firebase.database().ref('users/' + uid).child('favorites').once('value')
-          .then(favorites => {
-            return favorites.ref.update({[this.shopInfo.placeId]: true})
-          })
-          .then(() => {
-            this.saved = true
+      checkIfShopIsFavorite () {
+        this.$firestore
+          .collection('users')
+          .doc(this.user.uid)
+          .collection('favorites')
+          .doc(this.shopInfo.placeId)
+          .get()
+          .then(favoriteRecord => {
+            console.log(favoriteRecord)
+            this.isFavorite = favoriteRecord.exists
           })
           .catch(err => {
             console.log(err)
+          })
+      },
+      recordFavoriteShop () {
+        /**
+         * Record shop as a favorite for currentUser
+         * @type {string}
+         */
+        this.$firestore
+          .collection('users')
+          .doc(this.user.uid)
+          .collection('favorites')
+          .doc(this.shopInfo.placeId)
+          .set({
+            name: this.shopInfo.name,
+            created_on: Date.now()
+          })
+          .then(() => {
+            this.isFavorite = true
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      },
+      deleteFavorite () {
+        this.$firestore
+          .collection('users')
+          .doc(this.user.uid)
+          .collection('favorites')
+          .doc(this.shopInfo.placeId)
+          .delete()
+          .then(() => {
+            this.isFavorite = false
           })
       }
     }

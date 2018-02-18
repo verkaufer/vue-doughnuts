@@ -25,7 +25,7 @@
                             :position="infoWindow.pos"
                             :opened="infoWindow.open"
                             @closeclick="infoWindow.open=false">
-            <span v-html="infoWindow.content"></span>
+            <span v-html="infoWindow.displayableContent"></span>
           </gmap-info-window>
           <gmap-marker
             :key="index"
@@ -38,7 +38,7 @@
         </gmap-map>
       </b-col>
     </b-row>
-    <donut-shop-info :shop-info="infoWindow.content" v-show="infoWindow.open"></donut-shop-info>
+    <donut-shop-info :shop-info="infoWindow.content" :user="this.$parent.user" v-if="infoWindow.open"></donut-shop-info>
   </div>
 </template>
 
@@ -84,7 +84,8 @@
       },
       toggleInfoWindow (marker, index) {
         this.infoWindow.pos = marker.position
-        this.infoWindow.content = this.formatInfoWindow(marker.infoText.name, marker.infoText.address)
+        this.infoWindow.content = marker.infoText
+        this.infoWindow.displayableContent = this.formatInfoWindow(marker.infoText.name, marker.infoText.address)
         if (this.currentMarkerIndex === index) {
           this.infoWindow.open = !this.infoWindow.open
         } else {
