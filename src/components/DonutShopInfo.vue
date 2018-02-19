@@ -7,8 +7,8 @@
             {{ shopInfo.address }}
           </p>
           <p>
-            <b-button v-if="!isFavorite" href="" variant="primary" @click.prevent="recordFavoriteShop">Favorite Shop</b-button>
-            <b-button v-if="isFavorite" href="" variant="danger" @click.prevent="deleteFavorite">Unfavorite Shop</b-button>
+            <b-button v-if="!favoriteShop" href="" variant="primary" @click.prevent="recordFavoriteShop">Favorite Shop</b-button>
+            <b-button v-if="favoriteShop" href="" variant="danger" @click.prevent="deleteFavorite">Unfavorite Shop</b-button>
           </p>
         </b-card>
       </b-col>
@@ -16,72 +16,42 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+  import { mapGetters, mapActions } from 'vuex'
 
   export default {
     name: 'donutShopInfo',
     props: ['shopInfo'],
     data () {
       return {
-        saved: false,
-        isFavorite: false
+        favoriteShop: false
       }
     },
     computed: {
       ...mapGetters([
-        'user'
+        'user',
+        'isFavorite'
       ])
     },
     beforeMount: function () {
-      this.checkIfShopIsFavorite()
+      this.favoriteShop = this.isFavorite(this.shopInfo.placeId)
     },
     methods: {
-      checkIfShopIsFavorite () {
-        this.$firestore
-          .collection('users')
-          .doc(this.user.uid)
-          .collection('favorites')
-          .doc(this.shopInfo.placeId)
-          .get()
-          .then(favoriteRecord => {
-            this.isFavorite = favoriteRecord.exists
-          })
-          .catch(err => {
-            console.log(err)
-          })
-      },
       recordFavoriteShop () {
         /**
          * Record shop as a favorite for currentUser
          * @type {string}
          */
-        this.$firestore
-          .collection('users')
-          .doc(this.user.uid)
-          .collection('favorites')
-          .doc(this.shopInfo.placeId)
-          .set({
-            name: this.shopInfo.name,
-            created_on: Date.now()
-          })
-          .then(() => {
-            this.isFavorite = true
-          })
-          .catch(err => {
-            console.log(err)
-          })
+        this.newFavoriteShop({userID: this.user.uid, shop: this.shopInfo})
+        this.favoriteShop = true
       },
       deleteFavorite () {
-        this.$firestore
-          .collection('users')
-          .doc(this.user.uid)
-          .collection('favorites')
-          .doc(this.shopInfo.placeId)
-          .delete()
-          .then(() => {
-            this.isFavorite = false
-          })
-      }
+        this.removeFavoriteShop({userID: this.user.uid, shop: this.shopInfo})
+        this.favoriteShop = false
+      },
+      ...mapActions([
+        'newFavoriteShop',
+        'removeFavoriteShop'
+      ])
     }
   }
 </script>

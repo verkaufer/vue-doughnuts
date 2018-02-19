@@ -12,7 +12,6 @@
         <b-collapse is-nav id="nav_collapse">
           <b-nav is-nav-bar>
             <b-nav-item to="/">Home</b-nav-item>
-            <b-nav-item>Donuts</b-nav-item>
             <b-nav-item to="/favorites">Favorites</b-nav-item>
             <b-nav-item v-if="!authenticated" to="/login">Login</b-nav-item>
             <b-nav-item v-if="authenticated" @click="logout">Logout</b-nav-item>
@@ -68,10 +67,12 @@
 </style>
 
 <script>
-  import { mapGetters } from 'vuex'
+  import { mapGetters, mapActions } from 'vuex'
 
   export default {
     name: 'app',
+    mounted: function () {
+    },
     data () {
       return {
       }
@@ -86,10 +87,13 @@
       logout () {
         this.$firebaseApp.auth().signOut()
           .then(() => {
-            this.$store.dispatch('logout')
+            this.logout()
             this.$router.push('/login')
           })
-      }
+      },
+      ...mapActions([
+        'logout'
+      ])
     }
   }
 </script>

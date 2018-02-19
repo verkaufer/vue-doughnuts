@@ -33,8 +33,8 @@
             v-for="(m, index) in markers"
             :position="m.position"
             :clickable="true"
-            :draggable="true"
-            @click="center=m.position;toggleInfoWindow(m,index)"
+            :draggable="false"
+            @click="center=m.position;showInfoWindow(m,index)"
           ></gmap-marker>
         </gmap-map>
       </b-col>
@@ -89,13 +89,10 @@
       handleResize (event) {
         this.$gmapDefaultResizeBus.$emit('resize')
       },
-      toggleInfoWindow (marker, index) {
+      showInfoWindow (marker, index) {
         // Don't update if the clicked marker is already selected
-        if (index === this.currentMarkerIndex) return
-        // Reset data if different
-        if (index !== this.currentMarkerIndex) {
-          this.resetSelectedInfoWindow()
-        }
+        if (index === this.currentMarkerIndex) { return }
+        this.resetSelectedInfoWindow()
         this.infoWindow.pos = marker.position
         this.infoWindow.content = marker.infoText
         this.infoWindow.displayableContent = this.formatInfoWindow(marker.infoText.name, marker.infoText.address)

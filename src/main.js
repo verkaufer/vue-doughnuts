@@ -36,6 +36,7 @@ new Vue({
     this.$firebaseApp.auth().onAuthStateChanged((user) => {
       if (user) {
         this.$store.dispatch('updateAuthState', user)
+        this.$store.dispatch('loadFavorites', user.uid)
       }
     })
   },

@@ -18,11 +18,13 @@ export default {
     }
   },
   actions: {
-    authenticate ({commit}, payload) {
+    authenticate ({commit, dispatch}, payload) {
       commit('setUser', payload)
+      dispatch('loadFavorites', payload.uid)
     },
-    logout ({commit}) {
+    logout ({commit, dispatch}) {
       commit('setUser', null)
+      dispatch('clearFavorites')
     },
     updateAuthState ({commit}, payload) {
       commit('setUser', payload)
