@@ -3,11 +3,12 @@
     <b-row>
       <b-col>
         <b-form @submit.prevent="findDonuts" inline>
-          <b-input id="zip_search"
-                   placeholder="Enter your ZIP Code"
+          <label class="sr-only" for="zip_search">Enter ZIP Code</label>
+          <b-form-input id="zip_search"
+                   placeholder="Enter your ZIP Code (e.g. 97239)"
                    class="mb-2 mr-sm-2 form-control"
-                   v-model="userZipCode"
-          />
+                   v-model="zipCode"
+          ></b-form-input>
           <b-button variant="primary"
                     class="mb-2 mr-sm-2 form-control"
                     @click.prevent="findDonuts">Search</b-button>
@@ -18,10 +19,10 @@
       <b-col>
         <gmap-map
           :center="center"
-          :zoom="13"
+          :zoom="12"
           style="height:300px;position:relative;"
           ref="map"
-          @click="infoWindow.open=false">
+          @click="resetSelectedInfoWindow">
           <gmap-info-window :options="infoWindow.options"
                             :position="infoWindow.pos"
                             :opened="infoWindow.open"
@@ -39,7 +40,8 @@
         </gmap-map>
       </b-col>
     </b-row>
-    <donut-shop-info :shop-info="infoWindow.content" :key="infoWindow.content.placeId" v-if="infoWindow.open"></donut-shop-info>
+    <donut-shop-info :shop-info="infoWindow.content" :key="infoWindow.content.placeId" v-if="infoWindow.open">
+    </donut-shop-info>
   </div>
 </template>
 
@@ -57,7 +59,8 @@
     },
     data () {
       return {
-        userZipCode: null,
+        zipCode: null,
+        humanReadableLocation: null,
         center: {lat: 45.5231, lng: -122.6765},
         markers: [],
         currentMarkerIndex: null,
@@ -94,7 +97,7 @@
         if (index === this.currentMarkerIndex) { return }
         this.resetSelectedInfoWindow()
         this.infoWindow.pos = marker.position
-        this.infoWindow.content = marker.infoText
+        this.infoWindow.content = Object.assign(marker.infoText, {'approxLocation': this.humanReadableLocation})
         this.infoWindow.displayableContent = this.formatInfoWindow(marker.infoText.name, marker.infoText.address)
         this.infoWindow.open = true
         this.currentMarkerIndex = index
@@ -103,10 +106,11 @@
         let self = this
         axios({
           method: 'get',
-          url: geocoderAPIPath(this.userZipCode)
+          url: geocoderAPIPath(this.zipCode)
         }).then(response => {
           // Update map to show the ZIP we looked up
           self.center = response.data.results[0].geometry.location
+          self.humanReadableLocation = response.data.results[0].formatted_address
           return response.data.results[0].geometry.location
         }).then(geolocation => {
           const placesSearchService = new PlaceFinderService(self.$refs.map.$mapObject)

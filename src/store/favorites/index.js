@@ -1,26 +1,32 @@
 import Vue from 'vue'
+import * as types from '../mutation_types'
 
 export default {
   state: {
-    favorites: []
+    favorites: [],
+    saveStatus: null
   },
   mutations: {
-    initFavorites (state, payload) {
+    [types.INIT_FAVORITES] (state, payload) {
       state.favorites = [...payload]
     },
-    addFavorite (state, payload) {
+    [types.ADD_FAVORITE] (state, payload) {
       state.favorites.push(payload)
     },
-    removeFavorite (state, payload) {
+    [types.REMOVE_FAVORITE] (state, payload) {
       state.favorites = state.favorites.filter(favorite => favorite !== payload)
     },
-    clearAllFavorites (state, payload) {
+    [types.CLEAR_ALL_FAVORITES] (state) {
       state.favorites = []
+    },
+    [types.SET_SAVE_STATUS] (state, status) {
+      state.saveStatus = status
     }
   },
   getters: {
     favorites: (state) => { return state.favorites },
-    isFavorite: (state) => (shopId) => { return state.favorites.indexOf(shopId) > -1 }
+    isFavorite: (state) => (shopId) => { return state.favorites.indexOf(shopId) > -1 },
+    saveStatus: (state) => { return state.saveStatus }
   },
   actions: {
     /**
@@ -35,12 +41,13 @@ export default {
         .collection('users')
         .doc(userID)
         .collection('favorites')
+        .where('created_on', '>', 0)
         .get()
         .then(favorites => {
           favorites.forEach(favorite => {
             allFavorites.push(favorite.id)
           })
-          commit('initFavorites', allFavorites)
+          commit(types.INIT_FAVORITES, allFavorites)
         })
     },
     /**
@@ -50,6 +57,7 @@ export default {
      */
     newFavoriteShop ({commit}, payload) {
       const { userID, shop } = payload
+      commit(types.SET_SAVE_STATUS, 'pending')
       Vue.prototype.$firestore
           .collection('users')
           .doc(userID)
@@ -57,13 +65,16 @@ export default {
           .doc(shop.placeId)
           .set({
             name: shop.name,
+            approxLocation: shop.approxLocation,
             created_on: Date.now()
           })
           .then(() => {
-            commit('addFavorite', shop.placeId)
+            commit(types.ADD_FAVORITE, shop.placeId)
+            commit(types.SET_SAVE_STATUS, 'success')
           })
           .catch(err => {
             console.log(err)
+            commit(types.SET_SAVE_STATUS, 'failed')
           })
     },
     /**
@@ -72,19 +83,26 @@ export default {
      * @param payload Obj {userID: string, shop: { Obj }}
      */
     removeFavoriteShop ({commit}, payload) {
-      const { userID, shop } = payload
+      const { userID, shopId } = payload
+      commit(types.SET_SAVE_STATUS, 'pending')
       Vue.prototype.$firestore
         .collection('users')
         .doc(userID)
         .collection('favorites')
-        .doc(shop.placeId)
+        .doc(shopId)
         .delete()
         .then(() => {
-          commit('removeFavorite', shop.placeId)
+          commit(types.REMOVE_FAVORITE, shopId)
+        })
+        .catch(() => {
+          commit(types.SET_SAVE_STATUS, 'failed')
         })
     },
     clearFavorites ({commit}) {
-      commit('clearAllFavorites')
+      commit(types.CLEAR_ALL_FAVORITES)
+    },
+    resetSaveStatus ({commit}) {
+      commit(types.SET_SAVE_STATUS, null)
     }
   }
 }
