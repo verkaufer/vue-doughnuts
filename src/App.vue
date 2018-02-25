@@ -10,14 +10,14 @@
         <b-navbar-brand href="#">DonutTracker</b-navbar-brand>
 
         <b-collapse is-nav id="nav_collapse">
-          <b-nav is-nav-bar>
+          <b-navbar-nav>
             <b-nav-item to="/">Home</b-nav-item>
             <b-nav-item to="/favorites">Favorites</b-nav-item>
             <b-nav-item v-if="!authenticated" to="/login">Login</b-nav-item>
             <b-nav-item v-if="authenticated" @click="logout">Logout</b-nav-item>
             <b-nav-item></b-nav-item>
             <b-nav-text class="ml-right" v-if="authenticated">Hello, {{ user.email }}</b-nav-text>
-          </b-nav>
+          </b-navbar-nav>
         </b-collapse>
       </b-navbar>
     </div>
@@ -26,29 +26,6 @@
         <div id="content-panel">
           <router-view></router-view>
         </div>
-        <b-row>
-          <b-col lg="6">
-            <h4>Subheading</h4>
-            <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-            <h4>Subheading</h4>
-            <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-            <h4>Subheading</h4>
-            <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-          </b-col>
-          <b-col lg="6">
-            <h4>Subheading</h4>
-            <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-            <h4>Subheading</h4>
-            <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-            <h4>Subheading</h4>
-            <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-          </b-col>
-        </b-row>
-
       </main>
 
       <footer class="footer">
@@ -87,13 +64,13 @@
       logout () {
         this.$firebaseApp.auth().signOut()
           .then(() => {
-            this.logout()
+            this.announceLogout()
             this.$router.push('/login')
           })
       },
-      ...mapActions([
-        'logout'
-      ])
+      ...mapActions({
+        announceLogout: 'logout'
+      })
     }
   }
 </script>
