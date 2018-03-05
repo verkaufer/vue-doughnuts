@@ -1,27 +1,35 @@
+import {SET_LOADING_STATUS, SET_ERROR, CLEAR_ERROR} from '../mutation_types'
+
 export default {
   state: {
-    loading: false,
+    appLoading: true,
     error: null
   },
   mutations: {
-    setLoading (state, payload) {
-      state.loading = payload
+    [SET_LOADING_STATUS] (state, payload) {
+      state.appLoading = payload
     },
-    setError (state, payload) {
+    [SET_ERROR] (state, payload) {
       state.error = payload
     },
-    clearError (state) {
+    [CLEAR_ERROR] (state) {
       state.error = null
     }
   },
   actions: {
     clearError ({commit}) {
-      commit('clearError')
+      commit(CLEAR_ERROR)
+    },
+    ready ({commit}) {
+      commit(SET_LOADING_STATUS, false)
+    },
+    setError ({commit}, payload) {
+      commit(SET_ERROR, payload)
     }
   },
   getters: {
     loading (state) {
-      return state.loading
+      return state.appLoading
     },
     error (state) {
       return state.error

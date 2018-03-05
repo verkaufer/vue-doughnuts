@@ -49,6 +49,9 @@ export default {
           })
           commit(types.INIT_FAVORITES, allFavorites)
         })
+        .catch(() => {
+          commit(types.SET_ERROR, 'Problem loading favorite shops. Please refresh.')
+        })
     },
     /**
      * Saves reference to shop by placeID and appends placeID to store
@@ -72,9 +75,11 @@ export default {
             commit(types.ADD_FAVORITE, shop.placeId)
             commit(types.SET_SAVE_STATUS, 'success')
           })
-          .catch(err => {
-            console.log(err)
-            commit(types.SET_SAVE_STATUS, 'failed')
+          .catch(() => {
+            commit(types.SET_ERROR, 'Encountered issue saving shop. Please try again.')
+          })
+          .then(() => {
+            commit(types.SET_SAVE_STATUS, null)
           })
     },
     /**
@@ -95,7 +100,10 @@ export default {
           commit(types.REMOVE_FAVORITE, shopId)
         })
         .catch(() => {
-          commit(types.SET_SAVE_STATUS, 'failed')
+          commit(types.SET_ERROR, 'Encountered problem removing favorite. Please try again.')
+        })
+        .then(() => {
+          commit(types.SET_SAVE_STATUS, null)
         })
     },
     clearFavorites ({commit}) {

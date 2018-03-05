@@ -7,7 +7,7 @@
             {{ shopInfo.address }}
           </p>
           <p>
-            <b-alert v-if="saveStatus='failed'" variant="danger">Whoops! There was a problem saving that location. Please try again.</b-alert>
+            <b-alert v-if="error" variant="danger">Whoops! There was a problem saving that location. Please try again.</b-alert>
             <b-button v-if="!favoriteShop" href="" variant="primary" @click.prevent="recordFavoriteShop">Favorite Shop</b-button>
             <b-button v-if="favoriteShop" href="" variant="danger" @click.prevent="deleteFavorite">Unfavorite Shop</b-button>
           </p>
@@ -31,7 +31,8 @@
       ...mapGetters([
         'user',
         'isFavorite',
-        'saveStatus'
+        'saveStatus',
+        'error'
       ])
     },
     beforeMount: function () {

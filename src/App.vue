@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" v-if="!loading">
 
     <b-container>
     <div class="top-nav">
@@ -49,6 +49,7 @@
   export default {
     name: 'app',
     mounted: function () {
+      this.ready()
     },
     data () {
       return {
@@ -56,6 +57,7 @@
     },
     computed: {
       ...mapGetters([
+        'loading',
         'authenticated',
         'user'
       ])
@@ -69,6 +71,7 @@
           })
       },
       ...mapActions({
+        ready: 'ready',
         announceLogout: 'logout'
       })
     }

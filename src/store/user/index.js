@@ -27,7 +27,10 @@ export default {
       dispatch('clearFavorites')
     },
     updateAuthState ({commit}, payload) {
-      commit('setUser', payload)
+      return new Promise((resolve, reject) => {
+        commit('setUser', payload)
+        resolve()
+      })
     }
   }
 }

@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-// import Feed from '@/components/Feed'
+import { store } from '@/store'
+
 import Home from '@/components/Home'
 import Login from '@/components/Login'
 import Signup from '@/components/Signup'
@@ -33,17 +34,32 @@ let router = new Router({
     {
       path: '/favorites',
       name: 'Favorites',
-      component: Favorites
+      component: Favorites,
+      meta: {
+        requireAuthentication: true
+      }
     }
-    // {
-    //   path: '/feed',
-    //   name: 'Feed',
-    //   component: Feed,
-    //   meta: {
-    //     requiresAuth: true
-    //   }
-    // },
   ]
+})
+
+/**
+ * Perform check before entering routes requiring authentication
+ */
+router.beforeEach((to, from, next) => {
+  if (!to.matched.some(r => r.meta.requireAuthentication)) {
+    return next()
+  }
+  if (!store.getters.authenticated) {
+    next({
+      path: '/login'
+    })
+  } else {
+    next()
+  }
+})
+
+router.afterEach((to, from) => {
+  store.dispatch('clearError')
 })
 
 export default router

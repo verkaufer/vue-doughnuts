@@ -33,10 +33,13 @@ new Vue({
   router,
   store,
   created () {
+    // Firebase runs asynchronously, so we add Observer for auth state changes
+    // and commit those to Vuex
     this.$firebaseApp.auth().onAuthStateChanged((user) => {
       if (user) {
-        this.$store.dispatch('updateAuthState', user)
-        this.$store.dispatch('loadFavorites', user.uid)
+        this.$store.dispatch('updateAuthState', user).then(() => {
+          this.$store.dispatch('loadFavorites', user.uid)
+        })
       }
     })
   },

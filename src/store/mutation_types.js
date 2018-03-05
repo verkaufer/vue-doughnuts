@@ -6,3 +6,8 @@ export const SET_SAVE_STATUS = 'SET_SAVE_STATUS'
 
 // User/Auth mutations
 export const SET_USER = 'SET_USER'
+
+// Global mutations
+export const SET_LOADING_STATUS = 'SET_LOADING'
+export const CLEAR_ERROR = 'CLEAR_ERROR'
+export const SET_ERROR = 'SET_ERROR'

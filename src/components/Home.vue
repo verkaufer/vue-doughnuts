@@ -47,7 +47,7 @@
 
 <script>
   import axios from 'axios'
-  import { mapGetters } from 'vuex'
+  import { mapGetters, mapActions } from 'vuex'
 
   import PlaceFinderService from '@/services/places'
   import DonutShopInfo from '@/components/DonutShopInfo'
@@ -89,9 +89,15 @@
       window.removeEventListener('resize', this.handleResize)
     },
     methods: {
+      /**
+       * Helper method for GoogleMaps library to enforce adaptive resizing.
+       */
       handleResize (event) {
         this.$gmapDefaultResizeBus.$emit('resize')
       },
+      /**
+       * When user selects marker, build infowindow and show it over marker.
+       */
       showInfoWindow (marker, index) {
         // Don't update if the clicked marker is already selected
         if (index === this.currentMarkerIndex) { return }
@@ -102,6 +108,10 @@
         this.infoWindow.open = true
         this.currentMarkerIndex = index
       },
+      /**
+       * Convert ZIP Code submitted by user into a  geocode location and
+       * then look up shops nearby.
+       */
       findDonuts () {
         let self = this
         axios({
@@ -110,7 +120,9 @@
         }).then(response => {
           // Update map to show the ZIP we looked up
           self.center = response.data.results[0].geometry.location
+          // Parse out a plaintext address for later.
           self.humanReadableLocation = response.data.results[0].formatted_address
+          // Return the lat/long to placeSearchService
           return response.data.results[0].geometry.location
         }).then(geolocation => {
           const placesSearchService = new PlaceFinderService(self.$refs.map.$mapObject)
@@ -119,18 +131,29 @@
                     .then(placesSearchService.buildMarkers)
         }).then(markers => {
           self.markers = markers
-        }).catch(err => {
-          /* es-lint disable */
-          console.log(err)
+        }).catch(() => {
+          this.setError('Encountered error while looking up shops. Please try again.')
         })
       },
+      /**
+       * Wrap the name + address of marker info in HTML.
+       * @param name
+       * @param address
+       * @returns {string}
+       */
       formatInfoWindow (name, address) {
         return '<div><h3>' + name + '</h3><address>' + address + '</address></div>'
       },
+      /**
+       * Close the information window(s) and perform cleanup.
+       */
       resetSelectedInfoWindow () {
         this.infoWindow.open = false
         this.currentMarkerIndex = null
-      }
+      },
+      ...mapActions([
+        'setError'
+      ])
     }
   }
 </script>
