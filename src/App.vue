@@ -7,7 +7,7 @@
 
         <b-nav-toggle target="nav_collapse"></b-nav-toggle>
 
-        <b-navbar-brand href="#">DonutTracker</b-navbar-brand>
+        <b-navbar-brand href="#" class="font-weight-bold">DonutTracker 🍩</b-navbar-brand>
 
         <b-collapse is-nav id="nav_collapse">
           <b-navbar-nav>
@@ -15,8 +15,8 @@
             <b-nav-item to="/favorites">Favorites</b-nav-item>
             <b-nav-item v-if="!authenticated" to="/login">Login</b-nav-item>
             <b-nav-item v-if="authenticated" @click="logout">Logout</b-nav-item>
-            <b-nav-item></b-nav-item>
-            <b-nav-text class="ml-right" v-if="authenticated">Hello, {{ user.email }}</b-nav-text>
+
+            <b-nav-text class="pl-lg-5" v-if="authenticated">Hello, {{ user.email }}</b-nav-text>
           </b-navbar-nav>
         </b-collapse>
       </b-navbar>

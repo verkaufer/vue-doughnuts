@@ -1,14 +1,18 @@
 <template>
     <b-row>
       <b-col>
-        <h3>Your Favorite Donut Shops</h3>
+        <h3 class="text-center">Your Favorite Donut Shops</h3>
         <b-alert variant="danger"
                  dismissible
                  :show="error"
                  @dismissed="clearError">
           Whoops! We encountered an error. Please refresh the page to try again.
         </b-alert>
-        <strong v-if="requestPending">Loading...</strong>
+
+        <b-row v-if="requestPending" class="text-center">
+          <b-col><strong>Loading...</strong></b-col>
+        </b-row>
+
 
         <div v-if="!requestPending">
           <div v-if="!favorites.length">
@@ -17,8 +21,8 @@
           </div>
 
           <div v-if="favorites.length > 0">
-            <b-card-group columns class="mb-3">
-              <b-card v-for="(favorite, index) in favorites"
+              <b-col v-for="(favorite, index) in favorites" :key="favorite.id" class="mb-3">
+              <b-card cols="2"
                       border-variant="primary"
                       v-bind:header="favorite.data.name"
                       header-bg-variant="primary"
@@ -27,14 +31,17 @@
                 <p class="card-text">
                   <span>{{favorite.data.approxLocation}}</span>
                   <br>
-                  <b-button size="sm"
+                  <b-button-group>
+                    <b-button size="sm"
                             :href="google_maps_link_root + favorite.id"
                             rel="noopener noreferrer"
                             target="_blank">Google Maps</b-button>
-                  <b-button size="sm" @click="deleteFavorite(favorite.id)" variant="danger">Remove</b-button>
+                    <b-button size="sm" @click="deleteFavorite(favorite.id)" variant="danger">Remove</b-button>
+
+                  </b-button-group>
                 </p>
               </b-card>
-            </b-card-group>
+            </b-col>
           </div>
         </div>
 

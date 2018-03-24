@@ -12,6 +12,11 @@ const googleMapsAPI = {
   libraries: 'places'
 }
 
-const geocoderAPIPath = (zipCode) => `https://maps.googleapis.com/maps/api/geocode/json?address=${zipCode},US`
+const geocoderAPIPathFormatter = (zipCode) =>
+  `https://maps.googleapis.com/maps/api/geocode/json?address=${zipCode},US`
 
-export {firebaseConfig, googleMapsAPI, geocoderAPIPath}
+export {
+  firebaseConfig,
+  googleMapsAPI,
+  geocoderAPIPathFormatter
+}

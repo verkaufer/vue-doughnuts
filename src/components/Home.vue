@@ -51,7 +51,7 @@
 
   import PlaceFinderService from '@/services/places'
   import DonutShopInfo from '@/components/DonutShopInfo'
-  import {geocoderAPIPath} from '@/services/configs'
+  import {geocoderAPIPathFormatter} from '@/services/configs'
 
   export default {
     components: {
@@ -116,7 +116,7 @@
         let self = this
         axios({
           method: 'get',
-          url: geocoderAPIPath(this.zipCode)
+          url: geocoderAPIPathFormatter(this.zipCode)
         }).then(response => {
           // Update map to show the ZIP we looked up
           self.center = response.data.results[0].geometry.location
